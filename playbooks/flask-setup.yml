@@ -22,14 +22,26 @@
         group: ec2-user
         mode: '0755'
 
-    - name: Install Flask (if no requirements.txt is present)
-      ansible.builtin.pip:
-        name: flask
-        virtualenv: '{{ app_dir }}/venv'
-
     - name: Create virtual environment
       ansible.builtin.command:
         cmd: python3 -m venv venv
         chdir: '{{ app_dir }}'
       args:
         creates: '{{ app_dir }}/venv'
+
+    - name: Check if requirements.txt exists
+      ansible.builtin.stat:
+        path: '{{ app_dir }}/requirements.txt'
+      register: requirements_file
+
+    - name: Install dependencies from requirements.txt
+      ansible.builtin.pip:
+        requirements: '{{ app_dir }}/requirements.txt'
+        virtualenv: '{{ app_dir }}/venv'
+      when: requirements_file.stat.exists
+
+    - name: Install Flask (if no requirements.txt is present)
+      ansible.builtin.pip:
+        name: flask
+        virtualenv: '{{ app_dir }}/venv'
+      when: not requirements_file.stat.exists
