@@ -3,7 +3,7 @@ import sqlite3
 import os
 
 app = Flask(__name__)
-DB_PATH = os.path.join(os.path.dirname(__file__), 'data.db')
+DB_PATH = os.path.join(os.path.dirname(__file__), 'messages.db')
 
 def get_messages():
     conn = sqlite3.connect(DB_PATH)
