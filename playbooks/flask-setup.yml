@@ -22,6 +22,11 @@
         group: ec2-user
         mode: '0755'
 
+    - name: Install Flask (if no requirements.txt is present)
+      ansible.builtin.pip:
+        name: flask
+        virtualenv: '{{ app_dir }}/venv'
+
     - name: Create virtual environment
       ansible.builtin.command:
         cmd: python3 -m venv venv
