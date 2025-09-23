@@ -12,7 +12,6 @@
         name:
           - python3
           - python3-pip
-          - python3-venv
         state: present
 
     - name: Create application directory
@@ -29,8 +28,3 @@
         chdir: '{{ app_dir }}'
       args:
         creates: '{{ app_dir }}/venv'
-
-    - name: Install Flask dependencies
-      ansible.builtin.pip:
-        requirements: '{{ app_dir }}/requirements.txt'
-        virtualenv: '{{ app_dir }}/venv'
