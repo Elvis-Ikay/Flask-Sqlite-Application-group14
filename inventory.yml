@@ -1,5 +1,5 @@
 
-plugin: amazon.aws.aws_ec2
+plugin: amazon.aws.ec2
 regions:
   - eu-north-1
 filters:
@@ -7,5 +7,9 @@ filters:
 keyed_groups:
   - key: tags.project
     prefix: project
+  - key: tags.Project
+    prefix: Project
+  - key: tags.Name
+    prefix: name
 hostnames:
   - public-ip-address
