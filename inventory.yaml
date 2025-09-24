@@ -1,16 +1,16 @@
 ---
-plugin: amazon.aws.ec2
+plugin: aws_ec2
 regions:
   - eu-north-1
 filters:
-  "tag:Name": ansible-ec2
-# keyed_groups:
-#   - key: tags.project
-#     prefix: project
-#   - key: tags.Project
-#     prefix: Project
-#   - key: tags.Name
-#     prefix: name
+  "tag:Name": "flask-sqlite"
+keyed_groups:
+  - key: tags.project
+    prefix: "project"
+  - key: tags.Project
+    prefix: "Project"
+  - key: tags.Name
+    prefix: "name"
 hostnames:
   - public-ip-address
 #
