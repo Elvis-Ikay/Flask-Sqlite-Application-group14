@@ -14,19 +14,15 @@
         name: java-17-amazon-corretto-devel
         state: present
 
+    - name: Add Jenkins repo
+      ansible.builtin.get_url:
+        url: https://pkg.jenkins.io/redhat-stable/jenkins.repo
+        dest: /etc/yum.repos.d/jenkins.repo
+
     - name: Import Jenkins GPG key
       ansible.builtin.rpm_key:
         state: present
-        key: https://pkg.jenkins.io/redhat/jenkins.io.key
-
-    - name: Add Jenkins repository
-      ansible.builtin.yum_repository:
-        name: jenkins
-        description: Jenkins-stable
-        baseurl: https://pkg.jenkins.io/redhat-stable/
-        gpgcheck: yes
-        gpgkey: https://pkg.jenkins.io/redhat/jenkins.io.key
-        enabled: yes
+        key: https://pkg.jenkins.io/redhat/jenkins.io-2023.key
 
     - name: Install Jenkins
       ansible.builtin.dnf:
