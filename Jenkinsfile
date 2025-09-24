@@ -11,7 +11,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'develop',
+                git branch: 'feature/Elvis14-jenkins-setup',
                     url: 'git@github.com:Elvis-Ikay/Flask-Sqlite-Application-group14.git'
             }
         }
