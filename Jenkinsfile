@@ -20,7 +20,10 @@ pipeline {
         stage('Build Artifact') {
             steps {
                 sh """
-                tar -czf ${APP_NAME}.tar.gz *
+                mkdir -p build
+                cp -r app.py init_db.py init_db.sql requirements.txt templates playbooks build/
+                # Package everything in build/ into one tar.gz
+                tar -czf ${APP_NAME}.tar.gz -C build .
                 """
             }
         }
