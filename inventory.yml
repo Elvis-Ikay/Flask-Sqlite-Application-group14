@@ -7,4 +7,5 @@ filters:
 keyed_groups:
   - key: tags.project
     prefix: project
-
+hostnames:
+  - public-ip-address
