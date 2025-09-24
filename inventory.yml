@@ -1,13 +1,13 @@
----
-plugin: aws_ec2
+
+plugin: amazon.aws.aws_ec2
 regions:
   - eu-north-1
 filters:
-  tag:Project: flask-sqlite
+  tag:project: flask-sqlite
 keyed_groups:
   - key: tags.Name
     prefix: name
-  - key: tags.Project
+  - key: tags.project
     prefix: project
 hostnames:
   - private-ip-address
