@@ -1,5 +1,5 @@
 
-plugin: amazon.aws.aws_ec2
+plugin: amazon.aws.ec2
 regions:
   - eu-north-1
 filters:
@@ -14,3 +14,6 @@ keyed_groups:
 hostnames:
   - public-ip-address
 #
+# ... other settings
+host_vars:
+  ansible_python_interpreter: /usr/bin/python3
