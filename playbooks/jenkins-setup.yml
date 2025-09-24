@@ -9,9 +9,9 @@
         name: '*'
         state: latest
 
-    - name: Install Java 11 (required by Jenkins)
-      ansible.builtin.dnf:
-        name: java-11-openjdk-devel
+    - name: Install Java 17 (required by Jenkins)
+      ansible.builtin.package:
+        name: java-17-amazon-corretto-devel
         state: present
 
     - name: Import Jenkins GPG key
