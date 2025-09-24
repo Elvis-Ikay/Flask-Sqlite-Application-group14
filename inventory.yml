@@ -5,9 +5,6 @@ regions:
 filters:
   tag:project: flask-sqlite
 keyed_groups:
-  - key: tags.Name
-    prefix: name
   - key: tags.project
     prefix: project
-hostnames:
-  - private-ip-address
+
