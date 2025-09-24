@@ -12,7 +12,7 @@ keyed_groups:
   - key: tags.Name
     prefix: name
 hostnames:
-  - public-ip-address
+  - public_ip_address
 #
 # ... other settings
 host_vars:
