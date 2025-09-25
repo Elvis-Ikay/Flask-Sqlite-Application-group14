@@ -12,8 +12,8 @@ keyed_groups:
   - key: tags.Name
     prefix: name
 hostnames:
-  - "{{ ec2_target.hostname_type }}"
+  - tag.Name
 
 compose:
-  ansible_user: "{{ ec2_target.remote_user }}"
+  ansible_host: public_ip_address
   
