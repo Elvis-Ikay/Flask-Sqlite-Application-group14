@@ -1,0 +1,74 @@
+---
+- name: Deploy Flask + SQLite app on EC2 agent
+  hosts: project_flask_sqlite      # Matches dynamic inventory group
+  become: yes                      # Escalate privileges if needed
+  vars:
+    app_user: ec2-user                # Remote user
+    app_dir: /home/ec2-user/flask_app
+    requirements_file: /home/ec2-user/Flask-Sqlite-Application-group14/requirements.txt
+    flask_app_file: /home/ec2-user/Flask-Sqlite-Application-group14/app.py
+    port: 5000
+
+  tasks:
+
+    - name: Ensure Python 3 is installed
+      apt:
+        name: python3
+        state: present
+        update_cache: yes
+
+    - name: Ensure pip is installed
+      apt:
+        name: python3-pip
+        state: present
+
+    - name: Create app directory
+      file:
+        path: "{{ app_dir }}"
+        state: directory
+        owner: "{{ app_user }}"
+        group: "{{ app_user }}"
+        mode: 0755
+
+    - name: Copy Flask app files
+      copy:
+        src: "{{ flask_app_file }}"
+        dest: "{{ app_dir }}/app.py"
+        owner: "{{ app_user }}"
+        group: "{{ app_user }}"
+        mode: 0644
+
+    - name: Install Python dependencies
+      pip:
+        requirements: "{{ requirements_file }}"
+        executable: pip3
+
+    - name: Ensure Flask app is running with systemd
+      copy:
+        dest: /etc/systemd/system/flask_app.service
+        content: |
+          [Unit]
+          Description=Flask App Service
+          After=network.target
+
+          [Service]
+          User={{ app_user }}
+          WorkingDirectory={{ app_dir }}
+          ExecStart=/usr/bin/python3 {{ app_dir }}/app.py
+          Restart=always
+
+          [Install]
+          WantedBy=multi-user.target
+      notify:
+        - Reload systemd
+
+  handlers:
+    - name: Reload systemd
+      systemd:
+        daemon_reload: yes
+
+    - name: Start Flask service
+      systemd:
+        name: flask_app
+        state: started
+        enabled: yes
