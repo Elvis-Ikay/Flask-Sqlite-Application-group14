@@ -3,7 +3,7 @@ plugin: amazon.aws.aws_ec2
 regions:
   - eu-north-1
 filters:
-  "tag:project": flask-sqlite
+  "{{ ec2_target.filters }}"
 keyed_groups:
   - key: tags.project
     prefix: project
@@ -12,8 +12,8 @@ keyed_groups:
   - key: tags.Name
     prefix: name
 hostnames:
-  - tag.Name
+  - "{{ ec2_target.hostname_type }}"
 
 compose:
-  ansible_host: public_ip_address
+  ansible_user: "{{ ec2_target.remote_user }}"
   
