@@ -64,11 +64,11 @@
 
   handlers:
     - name: Reload systemd
-      ansible.builtin.systemd_service:
+      ansible.builtin.systemd:
         daemon_reload: true
 
     - name: Restart Flask service
-      ansible.builtin.systemd_service:
+      ansible.builtin.systemd:
         name: flask_app
         state: started
         enabled: true
