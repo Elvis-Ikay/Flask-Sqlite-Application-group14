@@ -5,7 +5,7 @@
   vars:
     app_user: ec2-user                # Remote user
     app_dir: /home/ec2-user/flask_app
-    requirements_file: /home/ubuntu/Flask-Sqlite-Application-group14/requirements.txt
+    requirements_file: /home/ec2-user/Flask-Sqlite-Application-group14/requirements.txt
     flask_app_file: /home/ubuntu/Flask-Sqlite-Application-group14/app.py
     port: 5000
 
