@@ -73,33 +73,6 @@
         state: restarted
         enabled: yes
 
-    - name: Ensure Flask app systemd service is in place
-      copy:
-        dest: /etc/systemd/system/flask_app.service
-        content: |
-          [Unit]
-          Description=Flask App Service
-          After=network.target
+        
 
-          [Service]
-          User={{ app_user }}
-          WorkingDirectory={{ app_dir }}
-          ExecStart=/usr/bin/python3 {{ app_dir }}/app.py
-          Restart=always
-
-          [Install]
-          WantedBy=multi-user.target
-      notify:
-        - Reload systemd
-        - Restart Flask service
-
-    # 🔎 Verify Flask app is running
-    - name: Wait for Flask app to respond
-      uri:
-        url: "http://localhost:{{ port }}"
-        status_code: 200
-      register: flask_status
-      retries: 5
-      delay: 3
-      until: flask_status.status == 200
-      ignore_errors: yes
+    
