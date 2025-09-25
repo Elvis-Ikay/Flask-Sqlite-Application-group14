@@ -62,19 +62,15 @@
       notify:
         - Reload systemd
 
-
+  handlers:
     - name: Reload systemd
-      systemd:
-        daemon_reload: yes
+      ansible.builtin.systemd_service:
+        daemon_reload: true
 
     - name: Restart Flask service
-      systemd:
-        name: flask
+      ansible.builtin.systemd_service:
+        name: flask_app
         state: started
-        enabled: yes
+        enabled: true
 
-        
-
-        
-
-    
+   
