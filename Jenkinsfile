@@ -43,10 +43,10 @@ pipeline {
         stage('Deploy with Ansible') {
             agent { label 'ansible-master' }
             steps {
-                sh """
-                ansible-playbook  playbooks/deploy.yml \
-                  --extra-vars "app_name=${APP_NAME} s3_bucket=${S3_BUCKET} region=${REGION}"
-                """
+                    sh """
+                    ansible-playbook  playbooks/deploy.yml \
+                    --extra-vars "app_name=${APP_NAME} s3_bucket=${S3_BUCKET} region=${REGION}"
+                    """
             }
         }
     }
