@@ -3,7 +3,7 @@
   hosts: flask
   become: yes
   vars:
-    app_dir: /home/ec2-user/flask-app
+    app_dir: /home/ec2-user/Flask-Sqlite-Application-group14
 
   tasks:
     - name: Ensure dependencies are installed
