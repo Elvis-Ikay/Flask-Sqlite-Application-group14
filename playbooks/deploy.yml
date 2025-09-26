@@ -42,10 +42,35 @@
         virtualenv: '{{ app_dir }}/venv'
         virtualenv_command: python3 -m venv
 
-    - name: Restart Flask app (dev mode)
-      ansible.builtin.shell: |
-        pkill -f "flask run" || true
-        source {{ app_dir }}/venv/bin/activate
-        nohup flask run --host=0.0.0.0 --port=5000 &
-      args:
-        chdir: '{{ app_dir }}'
+    - name: Create systemd service for Flask app
+      ansible.builtin.copy:
+        dest: /etc/systemd/system/flask-app.service
+        content: |
+          [Unit]
+          Description=Flask Application
+          After=network.target
+
+          [Service]
+          User=ec2-user
+          WorkingDirectory={{ app_dir }}
+          Environment="PATH={{ app_dir }}/venv/bin"
+          ExecStart={{ app_dir }}/venv/bin/flask run --host=0.0.0.0 --port=5000
+          Restart=always
+          StandardOutput=syslog
+          StandardError=syslog
+          SyslogIdentifier=flask-app
+
+          [Install]
+          WantedBy=multi-user.target
+      notify:
+        - reload systemd
+
+    - name: Ensure Flask app is running
+      ansible.builtin.systemd:
+        name: flask-app
+        state: started
+        enabled: true
+
+  handlers:
+    - name: reload systemd
+      ansible.builtin.command: systemctl daemon-reload
