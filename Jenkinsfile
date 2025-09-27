@@ -33,12 +33,14 @@ pipeline {
         stage('Upload to S3') {
             steps {
                 withAWS(region: "${REGION}", credentials: 'aws-creds') {
-                    
-                    s3Upload(
-                        file: "${APP_NAME}-$VERSION.tar.gz",
-                        bucket: "${S3_BUCKET}",
-                        path: "artifacts/${APP_NAME}-$VERSION.tar.gz"
-                    )
+                    script {
+                        def version = readFile('version.txt').trim()
+                        s3Upload(
+                            file: "${APP_NAME}-${version}.tar.gz",
+                            bucket: "${S3_BUCKET}",
+                            path: "artifacts/${APP_NAME}-${version}.tar.gz"
+                        )
+                    }
                 }
             }
         }
