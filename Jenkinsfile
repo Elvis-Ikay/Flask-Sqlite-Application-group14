@@ -33,10 +33,12 @@ pipeline {
         stage('Upload to S3') {
             steps {
                 withAWS(region: "${REGION}", credentials: 'aws-creds') {
-                    sh '''
-                    VERSION=$(cat version.txt)
-                    aws s3 cp ${APP_NAME}-$VERSION.tar.gz s3://${S3_BUCKET}/artifacts/
-                    '''
+                    
+                    s3Upload(
+                        file: "${APP_NAME}-$VERSION.tar.gz",
+                        bucket: "${S3_BUCKET}",
+                        path: "artifacts/${APP_NAME}-$VERSION.tar.gz"
+                    )
                 }
             }
         }
