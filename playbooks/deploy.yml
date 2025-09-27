@@ -1,9 +1,13 @@
 ---
-- name: Deploy Flask App from S3
+- name: Deploy Flask App from S3 with versioned releases
   hosts: flask
   become: yes
   vars:
     app_dir: /home/ec2-user/Flask-Sqlite-Application-group14
+    releases_dir: '{{ app_dir }}/releases'
+    current_link: '{{ app_dir }}/current'
+    release_version: "{{ lookup('pipe', 'date +%Y%m%d%H%M%S') }}"
+    release_path: '{{ releases_dir }}/{{ release_version }}'
 
   tasks:
     - name: Ensure dependencies are installed
@@ -21,6 +25,17 @@
           - botocore
         executable: pip3
 
+    - name: Ensure base directories exist
+      ansible.builtin.file:
+        path: '{{ item }}'
+        state: directory
+        owner: ec2-user
+        group: ec2-user
+        mode: '0755'
+      loop:
+        - '{{ releases_dir }}'
+        - '{{ current_link | dirname }}'
+
     - name: Download artifact from S3
       amazon.aws.aws_s3:
         bucket: '{{ s3_bucket }}'
@@ -29,18 +44,26 @@
         mode: get
         region: '{{ region }}'
 
-    - name: Extract artifact
+    - name: Extract artifact into versioned release folder
       ansible.builtin.unarchive:
         src: '/tmp/{{ app_name }}.tar.gz'
-        dest: '{{ app_dir }}'
+        dest: '{{ release_path }}'
         remote_src: yes
         extra_opts: [--strip-components=1]
+      become_user: ec2-user
 
-    - name: Install requirements
+    - name: Install requirements in virtualenv
       pip:
-        requirements: '{{ app_dir }}/requirements.txt'
-        virtualenv: '{{ app_dir }}/venv'
+        requirements: '{{ release_path }}/requirements.txt'
+        virtualenv: '{{ release_path }}/venv'
         virtualenv_command: python3 -m venv
+
+    - name: Update symlink to current release
+      ansible.builtin.file:
+        src: '{{ release_path }}'
+        dest: '{{ current_link }}'
+        state: link
+        force: yes
 
     - name: Create systemd service for Flask app
       ansible.builtin.copy:
@@ -52,9 +75,9 @@
 
           [Service]
           User=ec2-user
-          WorkingDirectory={{ app_dir }}
-          Environment="PATH={{ app_dir }}/venv/bin"
-          ExecStart={{ app_dir }}/venv/bin/flask run --host=0.0.0.0 --port=5000
+          WorkingDirectory={{ current_link }}
+          Environment="PATH={{ current_link }}/venv/bin"
+          ExecStart={{ current_link }}/venv/bin/flask run --host=0.0.0.0 --port=5000
           Restart=always
           StandardOutput=syslog
           StandardError=syslog
@@ -68,7 +91,7 @@
     - name: Ensure Flask app is running
       ansible.builtin.systemd:
         name: flask-app
-        state: started
+        state: restarted
         enabled: true
 
   handlers:

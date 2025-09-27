@@ -11,7 +11,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'feature/Elvis14-jenkins-setup',
+                git branch: 'feature/Elvis14-versioning-and-rollback',
                     url: 'https://github.com/Elvis-Ikay/Flask-Sqlite-Application-group14.git'
 
             }
@@ -20,10 +20,12 @@ pipeline {
         stage('Build Artifact') {
             steps {
                 sh """
+                VERSION=\$(date +%Y%m%d%H%M%S)-\$(git rev-parse --short HEAD)
+                echo \$VERSION > version.txt
+
                 mkdir -p build
                 cp -r app.py init_db.py init_db.sql requirements.txt templates playbooks build/
-                # Package everything in build/ into one tar.gz
-                tar -czf ${APP_NAME}.tar.gz -C build .
+                tar -czf ${APP_NAME}-\$VERSION.tar.gz -C build .
                 """
             }
         }
@@ -31,11 +33,10 @@ pipeline {
         stage('Upload to S3') {
             steps {
                 withAWS(region: "${REGION}", credentials: 'aws-creds') {
-                    s3Upload(
-                        file: "${APP_NAME}.tar.gz",
-                        bucket: "${S3_BUCKET}",
-                        path: "artifacts/${APP_NAME}.tar.gz"
-                    )
+                    sh '''
+                    VERSION=$(cat version.txt)
+                    aws s3 cp ${APP_NAME}-$VERSION.tar.gz s3://${S3_BUCKET}/artifacts/
+                    '''
                 }
             }
         }
@@ -43,10 +44,11 @@ pipeline {
         stage('Deploy with Ansible') {
             agent { label 'ansible-master' }
             steps {
-                    sh """
-                    ansible-playbook  playbooks/deploy.yml \
-                    --extra-vars "app_name=${APP_NAME} s3_bucket=${S3_BUCKET} region=${REGION}"
-                    """
+                sh '''
+                VERSION=$(cat version.txt)
+                ansible-playbook playbooks/deploy.yml \
+                  --extra-vars "app_name=${APP_NAME} app_version=$VERSION s3_bucket=${S3_BUCKET} region=${REGION}"
+                '''
             }
         }
     }
