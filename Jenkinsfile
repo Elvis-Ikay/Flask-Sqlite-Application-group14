@@ -1,11 +1,15 @@
 pipeline {
     agent any
 
+    triggers {
+        githubPush()
+    }
+
     environment {
         APP_NAME   = "flask-sqlite-app"
         S3_BUCKET  = "flask-artifacts-bucket-group14"   
         REGION     = "us-east-1"
-        DEPLOY_HOST = "flask"                        // host alias from your Ansible inventory
+        DEPLOY_HOST = "flask"                        
     }
 
     stages {
